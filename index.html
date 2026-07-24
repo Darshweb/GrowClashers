@@ -1,494 +1,421 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grow Clashers!</title>
-    <!-- Confetti Library -->
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Confetti Library for Party Popper -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Tailwind Config for Custom Brand Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            light: '#9CFF2E',
+                            DEFAULT: '#38E54D',
+                            dark: '#16a328',
+                            black: '#0a101d',
+                            panel: '#151f32'
+                        }
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 8s ease-in-out infinite 2s',
+                        'blob': 'blob 7s infinite',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-in': 'bounce-in 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'pop-emoji': 'pop-emoji 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-20px) rotate(2deg)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, filter: 'brightness(1)' },
+                            '50%': { opacity: .8, filter: 'brightness(1.2)' },
+                        },
+                        'bounce-in': {
+                            '0%': { opacity: 0, transform: 'scale(0.3)' },
+                            '50%': { opacity: 1, transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { opacity: 1, transform: 'scale(1)' }
+                        },
+                        'pop-emoji': {
+                            '0%': { transform: 'scale(0) rotate(-45deg)' },
+                            '80%': { transform: 'scale(1.2) rotate(10deg)' },
+                            '100%': { transform: 'scale(1) rotate(0deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        /* --- Google Fonts --- */
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;900&display=swap');
-
-        /* --- Custom Properties / Color Palette --- */
-        :root {
-            --primary-green: #38E54D;
-            --dark-green: #219F94;
-            --light-green: #9CFF2E;
-            --pure-white: #ffffff;
-            --bg-color: #F4FAFF;
-            --text-main: #2C3E50;
-            --text-muted: #596E82;
-            --vault-bg: #1e2922;
-        }
-
-        /* --- Reset & Base Styles --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
-            font-family: 'Nunito', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            overflow-x: hidden;
-            line-height: 1.6;
-            width: 100%;
+            background-color: #0a101d;
+            color: #f8fafc;
         }
 
-        /* --- Header / Navigation --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 5%;
-            background: var(--pure-white);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            transition: all 0.3s ease;
+        /* Animated Dark Grid Background */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
         }
 
-        .logo {
-            font-family: 'Fredoka', sans-serif;
-            font-weight: 700;
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            color: var(--dark-green);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: default;
-            user-select: none;
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(21, 31, 50, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .logo span {
-            color: var(--primary-green);
+        .glass-nav {
+            background: rgba(10, 16, 29, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        nav {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        nav a {
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 700;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            transition: color 0.3s ease;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 8px;
-        }
-
-        nav a:hover {
-            color: var(--primary-green);
-            background: rgba(56, 229, 77, 0.05);
-        }
-
-        /* --- Hero Section --- */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 140px 1rem 60px 1rem;
-            background: linear-gradient(135deg, #e0f7fa 0%, #c8e6c9 100%);
-            width: 100%;
-        }
-
-        .hero h1 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            color: var(--text-main);
-            text-shadow: 2px 2px 0px var(--pure-white);
-            line-height: 1.2;
-        }
-
-        .hero p {
-            font-size: clamp(1.1rem, 3vw, 1.4rem);
-            color: var(--text-muted);
-            max-width: 650px;
-            margin-bottom: 40px;
-            font-weight: 600;
-            padding: 0 10px;
-        }
-
-        /* --- Countdown Timer --- */
-        .timer-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: clamp(8px, 2vw, 20px);
-            margin-bottom: 40px;
-            width: 100%;
-            max-width: 550px;
-            padding: 0 10px;
-        }
-
-        .time-box {
-            background: var(--pure-white);
-            border: 3px solid var(--primary-green);
-            border-radius: 16px;
-            padding: clamp(10px, 2.5vw, 20px) 5px;
-            box-shadow: 0 10px 20px rgba(56, 229, 77, 0.15);
-            text-align: center;
-        }
-
-        .time-num {
-            font-family: 'Fredoka', sans-serif;
-            font-size: clamp(1.8rem, 5vw, 3.5rem);
-            font-weight: 700;
-            color: var(--dark-green);
-            display: block;
-            line-height: 1;
-        }
-
-        .time-label {
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 700;
-            margin-top: 5px;
-            display: block;
-        }
-
-        /* --- Buttons --- */
-        .btn-main {
-            background: var(--primary-green);
-            color: var(--text-main);
-            padding: clamp(14px, 3vw, 18px) clamp(30px, 6vw, 50px);
-            font-size: clamp(1.1rem, 3.5vw, 1.4rem);
-            font-weight: 900;
-            text-transform: uppercase;
-            border: 4px solid #fff;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 8px 0px var(--dark-green), 0 15px 20px rgba(0,0,0,0.1);
-            transition: all 0.1s ease;
-            text-decoration: none;
-            display: inline-block;
-            max-width: 90%;
-        }
-
-        .btn-main:active {
-            transform: translateY(6px);
-            box-shadow: 0 2px 0px var(--dark-green), 0 5px 10px rgba(0,0,0,0.1);
-        }
-        
-        .btn-main:hover {
-            background: var(--light-green);
-        }
-
-        /* --- Interactive "How To Play" Expandable Panel --- */
-        .how-to-play-section {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), margin 0.5s ease;
-            background: var(--pure-white);
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
-        }
-
-        .how-to-play-section.active {
-            max-height: 1400px; /* Generous constraint to avoid vertical cutoff on mobile stacking */
-            margin-top: 40px;
-            margin-bottom: 20px;
-            border: 3px solid var(--primary-green);
-        }
-
-        .how-content {
-            padding: clamp(20px, 5vw, 40px);
-            text-align: center;
-        }
-
-        .how-content h2 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: clamp(1.8rem, 5vw, 2.5rem);
-            color: var(--dark-green);
-            margin-bottom: 30px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background: var(--bg-color);
-            padding: 30px 20px;
-            border-radius: 16px;
-            text-align: center;
-            border-bottom: 5px solid var(--primary-green);
-        }
-        
-        .card-icon {
-            font-size: clamp(2.5rem, 6vw, 3.5rem);
-            margin-bottom: 15px;
-        }
-
-        .card h3 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: clamp(1.3rem, 3.5vw, 1.5rem);
-            margin-bottom: 10px;
-            color: var(--text-main);
-        }
-
-        .card p {
-            color: var(--text-muted);
-            font-size: clamp(0.95rem, 2.5vw, 1rem);
-            font-weight: 600;
-        }
-
-        /* --- Exclusive Leak Vault Section --- */
-        .leaks-section {
-            padding: clamp(60px, 10vw, 100px) 1rem;
-            background-color: var(--pure-white);
-            text-align: center;
-            width: 100%;
-        }
-
-        .leaks-section h2 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: clamp(2rem, 6vw, 2.8rem);
-            color: var(--text-main);
-            margin-bottom: 10px;
-        }
-
-        .leak-subtitle {
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            font-weight: 700;
-        }
-
-        .vault-box {
-            background-color: var(--vault-bg);
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: clamp(30px, 6vw, 50px) clamp(20px, 4vw, 30px);
-            border-radius: 20px;
-            border: 3px dashed var(--primary-green);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        /* Epic 3D Button */
+        .btn-epic {
             position: relative;
+            transition: all 0.15s ease;
+            box-shadow: 0 8px 0px #16a328, 0 15px 20px rgba(56,229,77,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .btn-epic:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0px #16a328, 0 5px 10px rgba(56,229,77,0.3);
         }
 
-        .vault-tag {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary-green);
-            color: var(--text-main);
-            padding: 5px 20px;
-            font-weight: 900;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-radius: 50px;
-            letter-spacing: 1px;
-            white-space: nowrap;
+        .text-glow {
+            text-shadow: 0 0 20px rgba(56, 229, 77, 0.6);
         }
 
-        .hint-badge {
-            font-size: clamp(3.5rem, 8vw, 4.5rem);
-            margin-bottom: 15px;
-            display: inline-block;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .vault-box h3 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: clamp(1.6rem, 4.5vw, 2rem);
-            color: var(--primary-green);
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
-        }
-
-        .vault-box p {
-            color: #b3cbb9;
-            font-size: clamp(1rem, 2.5vw, 1.1rem);
-            font-weight: 600;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* --- Media Queries for Layout Shifts --- */
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                gap: 12px;
-                padding: 15px 2%;
-                position: absolute; /* Frees vertical real estate on small smartphone landscape modes */
-            }
-            
-            .hero {
-                padding-top: 160px;
-            }
-            
-            .timer-container {
-                grid-template-columns: repeat(2, 1fr); /* 2x2 grid on standard phone viewports for safe reading */
-                max-width: 280px;
-            }
-        }
+        /* Hide scrollbar for a cleaner gaming aesthetic */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a101d; }
+        ::-webkit-scrollbar-thumb { background: #151f32; border-radius: 4px; border: 1px solid #1e293b; }
+        ::-webkit-scrollbar-thumb:hover { background: #38E54D; }
     </style>
 </head>
-<body>
+<body class="font-inter antialiased overflow-x-hidden selection:bg-brand selection:text-brand-black">
 
-    <!-- Header Navigation -->
-    <header id="navbar">
-        <div class="logo">Grow<span>Clashers!</span></div>
-        <nav>
-            <a onclick="scrollToHome()">Home</a>
-            <a onclick="toggleHowToPlay()">How to Play</a>
-            <a onclick="scrollToLeaks()">Seed Hints</a>
-        </nav>
-    </header>
+    <header class="fixed w-full top-0 z-50 transition-all duration-300" id="navbar">
+        <div class="glass-nav border-b border-white/10">
+            <div class="mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform">
+                    <div class="w-10 h-10 bg-gradient-to-br from-brand-light to-brand rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(56,229,77,0.4)]">
+                        <span class="text-2xl">🌱</span>
+                    </div>
+                    <div class="font-fredoka text-2xl font-bold text-white tracking-wide">
+                        Grow<span class="text-brand">Clashers</span>
+                    </div>
+                </div>
 
-    <!-- Hero / Main Landing Screen -->
-    <section class="hero" id="home">
-        <h1>Grow Clashers!</h1>
-        <p>The garden tycoon where you plant unique seeds, nurture powerful clashers, and harvest your crops to sell for massive cash profits!</p>
-        
-        <!-- Live Countdown Timer -->
-        <div class="timer-container">
-            <div class="time-box">
-                <span class="time-num" id="days">00</span>
-                <span class="time-label">Days</span>
-            </div>
-            <div class="time-box">
-                <span class="time-num" id="hours">00</span>
-                <span class="time-label">Hours</span>
-            </div>
-            <div class="time-box">
-                <span class="time-num" id="minutes">00</span>
-                <span class="time-label">Mins</span>
-            </div>
-            <div class="time-box">
-                <span class="time-num" id="seconds">00</span>
-                <span class="time-label">Secs</span>
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex gap-8 items-center bg-brand-panel/50 px-8 py-3 rounded-full border border-white/5">
+                    <a href="#home" class="font-semibold text-slate-300 hover:text-brand transition-colors text-sm uppercase tracking-wider">Home</a>
+                    <a href="#trailer" class="font-semibold text-slate-300 hover:text-brand transition-colors text-sm uppercase tracking-wider">Trailer</a>
+                    <a href="#how-to-play" class="font-semibold text-slate-300 hover:text-brand transition-colors text-sm uppercase tracking-wider">How to Play</a>
+                </nav>
+
+                <!-- Action Button -->
+                <a href="#home" class="hidden md:block bg-white text-brand-black font-fredoka font-bold px-8 py-3 rounded-full hover:bg-brand transition duration-300 shadow-lg hover:shadow-[0_0_20px_rgba(56,229,77,0.5)]">
+                    Play Now
+                </a>
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white focus:outline-none p-2" id="mobile-menu-btn">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
             </div>
         </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div class="md:hidden hidden absolute top-full left-0 w-full glass-panel border-t border-white/10 p-6 flex flex-col gap-4 text-center shadow-2xl" id="mobile-menu">
+            <a href="#home" class="font-bold text-white text-lg py-3 hover:bg-white/5 rounded-xl transition">Home</a>
+            <a href="#trailer" class="font-bold text-white text-lg py-3 hover:bg-white/5 rounded-xl transition">Trailer</a>
+            <a href="#how-to-play" class="font-bold text-white text-lg py-3 hover:bg-white/5 rounded-xl transition">How to Play</a>
+            <a href="#home" class="font-bold text-brand-black bg-brand text-lg py-3 rounded-xl mt-2">Play Now</a>
+        </div>
+    </header>
 
-        <button class="btn-main" id="action-btn" onclick="toggleHowToPlay()">See How To Play</button>
+    <section id="home" class="relative min-h-screen pt-32 pb-20 flex items-center overflow-hidden">
+        <!-- Background Grid & Glows -->
+        <div class="absolute inset-0 bg-grid opacity-50 z-0"></div>
+        <div class="absolute top-1/4 -left-32 w-96 h-96 bg-brand rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-blob"></div>
+        <div class="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-blob animation-delay-2000"></div>
 
-        <!-- Dynamic Expandable How To Play Container -->
-        <div class="how-to-play-section" id="howToPlayPanel">
-            <div class="how-content">
-                <h2>Gardening Core Mechanics</h2>
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-icon">🌱</div>
-                        <h3>1. Buy Seeds</h3>
-                        <p>Claim your open soil plot and spend your starting coins at the shop to purchase dynamic character seeds.</p>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-16 max-w-7xl mx-auto">
+                
+                <!-- Hero Text & Countdown Panel -->
+                <div class="flex-1 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/10 text-brand font-bold text-sm mb-8 border border-brand/20 shadow-[0_0_10px_rgba(56,229,77,0.1)]">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-brand"></span>
+                        </span>
+                        The Ultimate Garden Tycoon
                     </div>
-                    <div class="card">
-                        <div class="card-icon">⚔️</div>
-                        <h3>2. Grow Clashers</h3>
-                        <p>Nurture and grow your seeds directly in your garden bed. Watch them sprout into powerful live clashers.</p>
+                    
+                    <h1 class="font-fredoka text-5xl lg:text-7xl font-bold text-white leading-tight mb-6">
+                        Plant, Battle, <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-light to-brand text-glow">Conquer!</span>
+                    </h1>
+                    
+                    <p class="text-lg text-slate-400 mb-10 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
+                        Drop into the most vibrant tycoon experience! Plant unique seeds, nurture powerful clashers, and harvest your crops to build an unstoppable garden empire.
+                    </p>
+
+                    <!-- The Epic Countdown Glass Panel -->
+                    <div id="countdown-wrapper" class="glass-panel rounded-3xl p-8 mb-10 inline-block w-full max-w-xl relative overflow-hidden group">
+                        <!-- Shimmer effect -->
+                        <div class="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-5 group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                        
+                        <div id="countdown-content">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-brand font-fredoka text-xl tracking-wider uppercase font-bold flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                                    Global Launch In
+                                </h3>
+                                <span class="text-slate-400 text-sm font-medium">July 25, 5:00 PM</span>
+                            </div>
+
+                            <div class="grid grid-cols-4 gap-3 md:gap-5 text-center" id="countdown-container">
+                                <div class="bg-brand-black/80 rounded-2xl p-4 border border-white/10 shadow-inner relative overflow-hidden">
+                                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-brand to-transparent opacity-50"></div>
+                                    <span class="block text-4xl md:text-5xl font-fredoka font-bold text-white" id="days">00</span>
+                                    <span class="block text-xs md:text-sm text-slate-400 mt-2 uppercase font-bold tracking-widest">Days</span>
+                                </div>
+                                <div class="bg-brand-black/80 rounded-2xl p-4 border border-white/10 shadow-inner relative overflow-hidden">
+                                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-brand to-transparent opacity-50"></div>
+                                    <span class="block text-4xl md:text-5xl font-fredoka font-bold text-white" id="hours">00</span>
+                                    <span class="block text-xs md:text-sm text-slate-400 mt-2 uppercase font-bold tracking-widest">Hrs</span>
+                                </div>
+                                <div class="bg-brand-black/80 rounded-2xl p-4 border border-white/10 shadow-inner relative overflow-hidden">
+                                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-brand to-transparent opacity-50"></div>
+                                    <span class="block text-4xl md:text-5xl font-fredoka font-bold text-white" id="minutes">00</span>
+                                    <span class="block text-xs md:text-sm text-slate-400 mt-2 uppercase font-bold tracking-widest">Mins</span>
+                                </div>
+                                <div class="bg-brand-black/80 rounded-2xl p-4 border border-brand/30 shadow-[0_0_15px_rgba(56,229,77,0.15)] relative overflow-hidden">
+                                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-brand to-transparent"></div>
+                                    <span class="block text-4xl md:text-5xl font-fredoka font-bold text-brand drop-shadow-[0_0_8px_rgba(56,229,77,0.8)]" id="seconds">00</span>
+                                    <span class="block text-xs md:text-sm text-brand mt-2 uppercase font-bold tracking-widest">Secs</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card">
-                        <div class="card-icon">💰</div>
-                        <h3>3. Sell For Cash</h3>
-                        <p>Harvest your fully grown battle crops, clear your soil, and sell them instantly to compound your cash upgrades!</p>
+
+                    <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
+                        <a href="#trailer" class="btn-epic inline-block bg-brand text-brand-black font-fredoka text-xl font-bold py-4 px-10 rounded-2xl border-2 border-brand-light hover:bg-brand-light">
+                            Watch Trailer
+                        </a>
                     </div>
+                </div>
+
+                <div class="flex-1 w-full max-w-2xl relative z-20" id="trailer-container">
+                    <div class="relative rounded-3xl p-1 bg-gradient-to-br from-brand via-slate-800 to-blue-500 shadow-[0_0_40px_rgba(56,229,77,0.2)] animate-float">
+                        <div class="absolute -inset-2 bg-gradient-to-r from-brand to-blue-500 rounded-3xl blur opacity-20"></div>
+                        <div class="relative bg-brand-black rounded-[22px] overflow-hidden aspect-video border border-white/10 shadow-2xl group cursor-pointer">
+                            <!-- Premium Video Element -->
+                            <video id="game-trailer" class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105" poster="https://placehold.co/1920x1080/0a101d/38E54D?text=GROW+CLASHERS+TRAILER" controls preload="metadata">
+                                <source src="VID_20260719_000310.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            
+                            <!-- Custom Play Button Overlay -->
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 bg-brand-black/30 group-hover:bg-transparent" id="play-overlay">
+                                <div class="bg-white text-brand-black rounded-full p-5 shadow-[0_0_30px_rgba(255,255,255,0.3)] transform group-hover:scale-125 transition-transform duration-300">
+                                    <svg class="w-10 h-10 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Decorative elements around trailer -->
+                    <div class="absolute -top-6 -right-6 text-5xl animate-float-delayed z-30">🍄</div>
+                    <div class="absolute -bottom-8 -left-4 text-5xl animate-float z-30">⚔️</div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="how-to-play" class="py-32 relative bg-brand-black border-t border-white/5 overflow-hidden">
+        <!-- SVG background pattern -->
+        <div class="absolute inset-0 opacity-[0.02]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        
+        <div class="container mx-auto px-6 max-w-7xl relative z-10">
+            <div class="text-center mb-20">
+                <span class="text-brand font-bold tracking-widest uppercase text-sm mb-2 block">Gameplay</span>
+                <h2 class="font-fredoka text-4xl md:text-6xl font-bold text-white mb-6">Master the Mechanics</h2>
+                <div class="h-1.5 w-32 bg-gradient-to-r from-transparent via-brand to-transparent mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+                <!-- Card 1 -->
+                <div class="glass-panel rounded-[2rem] p-10 hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(56,229,77,0.15)] transition duration-500 group border-t border-white/10 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand rounded-full filter blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="w-20 h-20 bg-brand-panel border border-white/10 rounded-2xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform duration-500 shadow-xl relative z-10">
+                        🌱
+                    </div>
+                    <h3 class="font-fredoka text-3xl font-bold text-white mb-4 relative z-10">1. Buy Seeds</h3>
+                    <p class="text-slate-400 leading-relaxed text-lg relative z-10">
+                        Claim your soil plot and hit the shop. Spend coins to purchase dynamic seeds with hidden rarities and extreme battle potential.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-panel rounded-[2rem] p-10 hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(56,229,77,0.15)] transition duration-500 group border-t border-white/10 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand rounded-full filter blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="w-20 h-20 bg-brand-panel border border-white/10 rounded-2xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform duration-500 shadow-xl relative z-10">
+                        ⚔️
+                    </div>
+                    <h3 class="font-fredoka text-3xl font-bold text-white mb-4 relative z-10">2. Grow Clashers</h3>
+                    <p class="text-slate-400 leading-relaxed text-lg relative z-10">
+                        Nurture them in your garden bed. Watch as tiny sprouts evolve into massive, animated warriors ready to defend your turf.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-panel rounded-[2rem] p-10 hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(56,229,77,0.15)] transition duration-500 group border-t border-white/10 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand rounded-full filter blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="w-20 h-20 bg-brand-panel border border-white/10 rounded-2xl flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform duration-500 shadow-xl relative z-10">
+                        💰
+                    </div>
+                    <h3 class="font-fredoka text-3xl font-bold text-white mb-4 relative z-10">3. Sell For Cash</h3>
+                    <p class="text-slate-400 leading-relaxed text-lg relative z-10">
+                        Harvest fully grown crops to clear soil and secure massive cash payouts. Reinvest to unlock epic tycoon upgrades!
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Seed Leaks / Hints Vault Section -->
-    <section class="leaks-section" id="leaks">
-        <h2>Seed Database</h2>
-        <p class="leak-subtitle">Database logs: 1 Confirmed Data Leak Found</p>
-        
-        <div class="vault-box">
-            <div class="vault-tag">Verified Leak 01</div>
-            <span class="hint-badge">🍼</span>
-            <h3>Baby Clasher Seed</h3>
-            <p>A starter tier seed. Extremely quick growth cycles—perfect for accelerating early-game cash generation loops!</p>
+    <footer class="bg-[#05080f] text-slate-500 py-12 text-center border-t border-white/5">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-center gap-2 mb-6 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition duration-300">
+                <span class="text-2xl">🌱</span>
+                <div class="font-fredoka text-3xl font-bold text-white tracking-wide">
+                    Grow<span class="text-brand">Clashers</span>
+                </div>
+            </div>
+            <p class="text-sm font-medium mb-2">© 2026 Grow Clashers.</p>
         </div>
-    </section>
+    </footer>
 
-    <!-- UI Interaction Scripts -->
     <script>
-        // 1. Smooth Navigation Controllers
-        function toggleHowToPlay() {
-            const panel = document.getElementById("howToPlayPanel");
-            panel.classList.toggle("active");
-            
-            if(panel.classList.contains("active")) {
-                setTimeout(() => {
-                    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 200);
-            }
-        }
-
-        function scrollToHome() {
-            document.getElementById("home").scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function scrollToLeaks() {
-            document.getElementById("leaks").scrollIntoView({ behavior: 'smooth' });
-        }
+        // 1. Mobile Menu Toggle Logic
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
         
-        // 2. Confetti Explosion Function using Game Colors
-        function triggerLaunchConfetti() {
-            var duration = 4000;
-            var end = Date.now() + duration;
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
 
-            (function frame() {
-                confetti({
-                    particleCount: 4,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0, y: 0.8 },
-                    colors: ['#38E54D', '#9CFF2E', '#219F94', '#ffffff']
-                });
-                confetti({
-                    particleCount: 4,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1, y: 0.8 },
-                    colors: ['#38E54D', '#9CFF2E', '#219F94', '#ffffff']
-                });
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
 
-                if (Date.now() < end) {
-                    requestAnimationFrame(frame);
+        // 2. Video Player Overlay Logic
+        const video = document.getElementById('game-trailer');
+        const playOverlay = document.getElementById('play-overlay');
+
+        video.addEventListener('play', () => {
+            playOverlay.style.opacity = '0';
+        });
+        video.addEventListener('pause', () => {
+            playOverlay.style.opacity = '1';
+        });
+
+        // 3. Epic Party Popper Effect (Massive Confetti Blast)
+        function popPartyPopper() {
+            const duration = 5000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 45, spread: 360, ticks: 100, zIndex: 100 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            // Interval for continuous blasts
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
                 }
-            }());
+
+                const particleCount = 60 * (timeLeft / duration);
+                
+                // Shoot from multiple sides
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                    colors: ['#38E54D', '#9CFF2E', '#ffffff', '#FFD700', '#FF3E4D']
+                }));
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                    colors: ['#38E54D', '#9CFF2E', '#ffffff', '#FFD700', '#FF3E4D']
+                }));
+            }, 250);
+
+            // Initial massive center blast
+            confetti({
+                particleCount: 250,
+                spread: 120,
+                origin: { y: 0.6 },
+                colors: ['#38E54D', '#9CFF2E', '#ffffff', '#FFD700', '#FF3E4D'],
+                startVelocity: 60
+            });
         }
 
-        // 3. Countdown Engine Target Date: August 7, 2026 5:00 PM (17:00:00)
-        const launchDate = new Date("August 7, 2026 17:00:00").getTime();
+        // 4. Countdown Engine - Strict Target: July 25, 2026 5:00 PM (17:00:00)
+        const launchDate = new Date("July 25, 2026 17:00:00").getTime();
         let hasLaunched = false;
 
         const countdownInterval = setInterval(function() {
             const now = new Date().getTime();
             const distance = launchDate - now;
 
-            // Display formatting safely inside positive boundaries
             if (distance >= 0) {
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -501,23 +428,50 @@
                 document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
             }
 
-            // Trigger when launch complete
+            // Trigger Launch Sequence when countdown hits 0
             if (distance < 0 && !hasLaunched) {
                 hasLaunched = true;
                 clearInterval(countdownInterval);
                 
-                // Update UI to Launched State smoothly
-                document.querySelector(".timer-container").innerHTML = "<div style='grid-column: span 4; text-align:center;'><h2 style='color: var(--dark-green); font-family: Fredoka, sans-serif; font-size: clamp(2rem, 6vw, 3.5rem); text-shadow: 2px 2px 0px #fff; line-height:1.2;'>The Game is LIVE!</h2></div>";
+                // Animate and swap the countdown panel content
+                const contentDiv = document.getElementById("countdown-content");
                 
-                const actionBtn = document.getElementById("action-btn");
-                actionBtn.innerText = "Play Now on Roblox!";
-                actionBtn.onclick = function() { window.open("https://www.roblox.com", "_blank"); };
+                contentDiv.style.opacity = '0';
                 
-                // Fire the Confetti!
-                triggerLaunchConfetti();
+                setTimeout(() => {
+                    contentDiv.innerHTML = `
+                        <div class="flex flex-col items-center justify-center py-6 text-center h-full">
+                            <div class="text-7xl mb-4 animate-pop-emoji drop-shadow-xl" id="popper-icon">🎉</div>
+                            <h2 class="text-brand font-fredoka text-5xl md:text-6xl font-bold uppercase tracking-wider drop-shadow-[0_0_20px_rgba(56,229,77,0.6)] animate-bounce-in">
+                                GAME IS LIVE!
+                            </h2>
+                            <p class="text-slate-300 mt-4 mb-8 font-medium animate-bounce-in" style="animation-delay: 0.2s">The servers are open. Join the battle now.</p>
+                            <a href="https://www.roblox.com" target="_blank" class="btn-epic inline-block bg-brand text-brand-black font-fredoka text-2xl font-bold py-4 px-12 rounded-2xl border-2 border-brand-light hover:bg-brand-light w-full shadow-[0_0_30px_rgba(56,229,77,0.4)] animate-bounce-in" style="animation-delay: 0.4s">
+                                PLAY NOW
+                            </a>
+                        </div>
+                    `;
+                    contentDiv.style.transition = 'opacity 0.5s ease-in';
+                    contentDiv.style.opacity = '1';
+                    
+                    // Trigger the massive party popper confetti effect
+                    popPartyPopper();
+                    
+                }, 400);
             }
         }, 1000);
-    </script>
 
+        // 5. Navbar Scroll Effect (Dark Theme variation)
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('header .glass-nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(5, 8, 15, 0.95)';
+                nav.style.boxShadow = '0 10px 30px -10px rgba(0,0,0,0.5)';
+            } else {
+                nav.style.background = 'rgba(10, 16, 29, 0.8)';
+                nav.style.boxShadow = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
